@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:jo_study/utils/consts.dart';
+import 'package:jo_study/utils/date_utils.dart';
 
 class WeekDayPicker extends StatefulWidget {
   @override
@@ -15,7 +16,7 @@ class _WeekDayPickerState extends State<WeekDayPicker> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: Cv.weekdays_ru.map((day) {
+      children: Utils.weekdays.map((day) {
         return InkWell(
           focusColor: Colors.black,
           child: GestureDetector(

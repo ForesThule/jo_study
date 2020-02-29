@@ -14,14 +14,4 @@ class Cv {
     DateTime.saturday,
     DateTime.sunday
   ];
-
-  static const List<String> weekdays_ru = const [
-    "ПН",
-    "ВТ",
-    "СР",
-    "ЧТ",
-    "ПТ",
-    "СБ",
-    "ВС"
-  ];
 }

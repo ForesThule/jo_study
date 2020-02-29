@@ -37,17 +37,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 //      yield* _mapAddExcerciseToState(event);
 //    }
 
-    else if (event is UpdateExcersise) {
-      yield* _mapUpdateExcerciseToState(event);
-    }
-
 //    else if (event is SelectClassworkForDay) {
 //      yield* _selectClassworkForDay(event);
 //    }
 
-    else if (event is DeleteExcercise) {
-      yield* _mapDeleteExcerciseToState(event);
-    }
 //    else if (event is ToggleAll) {
 //      yield* _mapToggleAllToState();
 //    } else if (event is ClearCompleted) {
@@ -64,47 +57,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     } catch (_) {
       yield ExcerciseNotLoaded();
     }
-  }
-
-  Stream<AppState> _mapUpdateExcerciseToState(UpdateExcersise event) async* {
-    if (state is ExcerciseLoaded) {
-      final List<Classwork> updatedExcercise =
-          (state as ExcerciseLoaded).excercises.map((excercise) {
-        return excercise.id == event.updatedExcercise.id
-            ? event.updatedExcercise
-            : Classwork;
-      }).toList();
-      yield ExcerciseLoaded(updatedExcercise);
-      _saveExcercise(updatedExcercise);
-    }
-  }
-
-  Stream<AppState> _mapDeleteExcerciseToState(DeleteExcercise event) async* {
-    if (state is ExcerciseLoaded) {
-      final updatedExcercise = (state as ExcerciseLoaded)
-          .excercises
-          .where((Excercise) => Excercise.id != event.excercise.id)
-          .toList();
-      yield ExcerciseLoaded(updatedExcercise);
-      _saveExcercise(updatedExcercise);
-    }
-  }
-
-  Stream<AppState> _mapClearCompletedToState() async* {
-    if (state is ExcerciseLoaded) {
-      final List<Classwork> updatedExcercise = (state as ExcerciseLoaded)
-          .excercises
-          .where((exc) => !exc.isEveryWeekShow)
-          .toList();
-      yield ExcerciseLoaded(updatedExcercise);
-      _saveExcercise(updatedExcercise);
-    }
-  }
-
-  Future _saveExcercise(List<Classwork> Excercise) {
-    return repo.saveExcercise(
-      Excercise.map((Excercise) => Excercise.toEntity()).toList(),
-    );
   }
 
   _mapMonthToState() {

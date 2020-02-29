@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:date_format/date_format.dart';
-import 'package:date_utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,6 +9,7 @@ import 'package:jo_study/bloc/blocs.dart';
 import 'package:jo_study/bloc/day_bloc.dart';
 import 'package:jo_study/bloc/month_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/utils/date_utils.dart';
 import 'package:jo_study/widgets/horizontal_wheel.dart';
 
 class DayScreen extends StatefulWidget {

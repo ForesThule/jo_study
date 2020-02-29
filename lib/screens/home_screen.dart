@@ -5,6 +5,8 @@ import 'package:jo_study/app_keys.dart';
 import 'package:jo_study/bloc/day_bloc.dart';
 import 'package:jo_study/bloc/month_bloc.dart';
 import 'package:jo_study/bloc/states.dart';
+import 'package:jo_study/bloc/task_bloc.dart';
+import 'package:jo_study/bloc/week_bloc.dart';
 import 'package:jo_study/localization.dart';
 import 'package:jo_study/screens/week_screen.dart';
 import 'package:jo_study/tab_selector.dart';
@@ -32,12 +34,14 @@ class HomeScreen extends StatelessWidget {
           child: MonthScreen(),
         );
       } else if (state is Week) {
-        return WeekScreen();
+        return BlocProvider(
+            create: (context) => WeekBloc(bloc.repo), child: WeekScreen());
       } else if (state is Day) {
         return BlocProvider(
             create: (context) => DayBloc(bloc.repo), child: DayScreen());
       } else if (state is Task) {
-        return TaskScreen();
+        return BlocProvider(
+            create: (context) => TaskBloc(bloc.repo), child: TaskScreen());
       } else if (state is Exam) {
         return ExamScreen();
       } else {
