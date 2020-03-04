@@ -39,10 +39,10 @@ class HomeScreen extends StatelessWidget {
       } else if (state is Day) {
         return BlocProvider(
             create: (context) => DayBloc(bloc.repo), child: DayScreen());
-      } else if (state is Task) {
+      } else if (state is TaskScreenState) {
         return BlocProvider(
             create: (context) => TaskBloc(bloc.repo), child: TaskScreen());
-      } else if (state is Exam) {
+      } else if (state is ExamState) {
         return ExamScreen();
       } else {
         return MonthScreen();
@@ -93,9 +93,9 @@ class HomeScreen extends StatelessWidget {
       return AppTab.week;
     } else if (state is Day) {
       return AppTab.day;
-    } else if (state is Task) {
+    } else if (state is TaskScreenState) {
       return AppTab.task;
-    } else if (state is Exam) {
+    } else if (state is ExamState) {
       return AppTab.exam;
     } else {
       return AppTab.month;
@@ -132,7 +132,7 @@ class HomeScreen extends StatelessWidget {
 //      );
 //    }
 
-    else if (state is Task) {
+    else if (state is TaskScreenState) {
       return AppBar(
         title: Text("Задание"),
         actions: [
@@ -140,7 +140,7 @@ class HomeScreen extends StatelessWidget {
 //              ExtraActions(),
         ],
       );
-    } else if (state is Exam) {
+    } else if (state is ExamState) {
       return AppBar(
         title: Text("Экзамен"),
         actions: [

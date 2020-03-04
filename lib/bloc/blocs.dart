@@ -77,10 +77,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         yield Week();
         break;
       case AppTab.task:
-        yield Task();
+        yield TaskScreenState();
         break;
       case AppTab.exam:
-        yield Exam();
+        yield ExamState();
         break;
     }
   }

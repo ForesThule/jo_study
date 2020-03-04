@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 import 'package:jo_study/bloc/states.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/model/task.dart';
 import 'package:jo_study/utils/date_utils.dart';
 
 import '../repositoty.dart';
@@ -60,4 +61,9 @@ abstract class TaskEvent extends Equatable {
 
   @override
   List<Object> get props => [];
+}
+
+class AddTaskEvent extends TaskEvent {
+  Task task;
+  AddTaskEvent(this.task);
 }

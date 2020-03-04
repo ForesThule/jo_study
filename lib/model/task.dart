@@ -30,18 +30,20 @@ class Task extends Equatable {
   String place;
 
   @HiveField(5)
-  DateTime startDate;
+  DateTime date;
 
   @HiveField(6)
-  DateTime finishDate;
-
-  @HiveField(7)
   int colorValue;
+
+  String when;
+
+  String note;
 
   Task copyWith(
       {bool isEveryWeekShow,
       String id,
       String note,
+      String when,
       String task,
       String subject,
       String tutor,
@@ -55,8 +57,7 @@ class Task extends Equatable {
       subject: subject ?? this.subject,
       tutor: tutor ?? this.tutor,
       place: place ?? this.place,
-      startDate: startDate ?? this.startDate,
-      finishDate: finishDate ?? this.finishDate,
+      startDate: startDate ?? this.date,
       colorValue: colorValue ?? this.colorValue,
     );
   }
@@ -75,25 +76,16 @@ class Task extends Equatable {
         this.tutor = tutor,
         this.isEveryWeekShow = isEveryWeekShow,
         this.place = place,
-        this.startDate = startDate,
-        this.finishDate = finishDate,
+        this.date = startDate,
         this.colorValue = colorValue;
 
   @override
-  List<Object> get props => [
-        isEveryWeekShow,
-        id,
-        subject,
-        tutor,
-        place,
-        startDate,
-        finishDate,
-        colorValue
-      ];
+  List<Object> get props =>
+      [isEveryWeekShow, id, subject, tutor, place, date, colorValue];
 
   @override
   String toString() {
-    return 'Task{id: $id, isEveryWeekShow: $isEveryWeekShow, subject: $subject, tutor: $tutor, place: $place, startDate: $startDate, finishDate: $finishDate, colorValue: $colorValue}';
+    return 'Task{id: $id, isEveryWeekShow: $isEveryWeekShow, subject: $subject, tutor: $tutor, place: $place, startDate: $date, colorValue: $colorValue}';
   }
 
   Task toEntity() {
@@ -103,15 +95,13 @@ class Task extends Equatable {
         place: place,
         subject: subject,
         tutor: tutor,
-        startDate: startDate,
-        finishDate: finishDate,
+        startDate: date,
         colorValue: colorValue);
   }
 
   static Task fromEntity(Task entity) {
     return Task(
-      startDate: entity.startDate,
-      finishDate: entity.finishDate,
+      startDate: entity.date,
       place: entity.place,
       tutor: entity.tutor,
       isEveryWeekShow: entity.isEveryWeekShow,

@@ -8,6 +8,7 @@ import 'package:jo_study/bloc/blocs.dart';
 import 'package:jo_study/repositoty.dart';
 import 'package:jo_study/screens/home_screen.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'model/classwork.dart';
 
@@ -38,6 +39,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        supportedLocales: [
+          const Locale('en'), // English
+          const Locale('ru'),
+          const Locale.fromSubtags(
+              languageCode: 'zh'), // Chinese *See Advanced Locales below*
+          // ... other locales the app supports
+        ],
+        localizationsDelegates: [
+          // ... app-specific localization delegate[s] here
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         title: 'Flutter Demo',
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark(),

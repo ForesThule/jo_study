@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jo_study/bloc/task_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/widgets/custom_dialog.dart';
+import 'package:vector_math/vector_math.dart' as math;
 
 class TaskScreen extends StatefulWidget {
   @override
@@ -15,6 +17,37 @@ class _TaskScreenState extends State<TaskScreen> {
     final TaskBloc bloc = BlocProvider.of<TaskBloc>(context);
 
     PageController pageController = PageController();
+
+    void addTask() {
+      debugPrint("ADD TASK");
+
+      showGeneralDialog(
+          barrierLabel: '',
+          barrierDismissible: true,
+          context: context,
+          transitionDuration: Duration(milliseconds: 200),
+          transitionBuilder: (context, anim1, anim2, child) {
+            final curvedValue = Curves.easeInOutBack.transform(anim1.value);
+
+            return Transform.scale(
+//              transform: Matrix4.translationValues(0.0, curvedValue * 50, 0.0),
+              scale: curvedValue,
+//              angle: math.radians(anim1.value * 360),
+              child: Opacity(
+                opacity: anim1.value,
+                child: TaskDialog(
+                  bloc: bloc,
+                  buildcontext: context,
+                  title: "Добавить задание",
+                  description:
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                  buttonText: "Okay",
+                ),
+              ),
+            );
+          },
+          pageBuilder: (context, showAnimation, hideAnimation) {});
+    }
 
     return LayoutBuilder(builder: (context, w) {
       return Container(
@@ -103,9 +136,5 @@ class _TaskScreenState extends State<TaskScreen> {
         ),
       );
     });
-  }
-
-  void addTask() {
-    debugPrint("ADD TASK");
   }
 }

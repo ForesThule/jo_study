@@ -61,9 +61,8 @@ class AppRepository {
 
     for (var day in daysInRange) {
       List<Task> tasks = allTasks
-          .where((task) => null != task.startDate
-              ? Utils.isSameDay(task.startDate, day)
-              : false)
+          .where((task) =>
+              null != task.date ? Utils.isSameDay(task.date, day) : false)
           .toList();
 
       mapResult[day] = tasks;

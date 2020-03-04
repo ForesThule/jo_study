@@ -21,15 +21,14 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..subject = fields[2] as String
       ..tutor = fields[3] as String
       ..place = fields[4] as String
-      ..startDate = fields[5] as DateTime
-      ..finishDate = fields[6] as DateTime
-      ..colorValue = fields[7] as int;
+      ..date = fields[5] as DateTime
+      ..colorValue = fields[6] as int;
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,10 +40,8 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(4)
       ..write(obj.place)
       ..writeByte(5)
-      ..write(obj.startDate)
+      ..write(obj.date)
       ..writeByte(6)
-      ..write(obj.finishDate)
-      ..writeByte(7)
       ..write(obj.colorValue);
   }
 }
