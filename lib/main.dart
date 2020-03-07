@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_file.dart';
 import 'package:jo_study/bloc/blocs.dart';
+import 'package:jo_study/model/task.dart';
 import 'package:jo_study/repositoty.dart';
 import 'package:jo_study/screens/home_screen.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,7 +28,8 @@ void main() async {
 
   Hive
     ..init(appDocDirectory.path)
-    ..registerAdapter(ClassworkAdapter());
+    ..registerAdapter(ClassworkAdapter())
+    ..registerAdapter(TaskAdapter());
 
   runApp(MyApp());
 }

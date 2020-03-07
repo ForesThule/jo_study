@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -20,14 +21,14 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 //    yield* repo.getClassworksForPeriod(period);
 //  }
 
-  Stream<Map<DateTime, List<Classwork>>> getTasksForCurrentMonth() async* {
+  Stream<Map<DateTime, List<Task>>> getTasksForCurrentMonth() async* {
     var now = DateTime.now();
     var firstDayOfWeek = Utils.firstDayOfMonth(now);
     var lastday = Utils.lastDayOfMonth(now);
     List<DateTime> thisMonth =
         Utils.daysInRange(firstDayOfWeek, lastday).toList();
 
-    yield* repo.getClassworksForPeriod(thisMonth);
+    yield* repo.getTasksForPeriod(thisMonth);
   }
 
   TaskBloc(this.repo);
@@ -36,13 +37,24 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
   TaskState get initialState => InitTaskViewState();
 
   @override
-  Stream<TaskState> mapEventToState(TaskEvent event) async* {}
+  Stream<TaskState> mapEventToState(TaskEvent event) async* {
+    if (event is AddTaskEvent) {
+      await saveTask(event.task);
+      yield TaskSavedState();
+    }
+  }
 
   Future saveClasswork(Classwork classwork) {
     return repo.saveClasswork(classwork);
   }
 
+  Future saveTask(Task task) {
+    return repo.saveTask(task);
+  }
+
   getCurrentDateClasswork() {}
+
+  getTasksForPeriod() {}
 }
 
 ///////////////////////////////////////////////////////////////
@@ -54,6 +66,8 @@ abstract class TaskState extends Equatable {
 }
 
 class InitTaskViewState extends TaskState {}
+
+class TaskSavedState extends TaskState {}
 
 ///////////////////////////////////////////////////////////////////
 abstract class TaskEvent extends Equatable {

@@ -98,9 +98,12 @@ class AppRepository {
     yield where.toList();
   }
 
-  Future saveTask(Classwork classwork) async {
-    var classworkbox = await Hive.openBox('task');
-    await classworkbox.add(classwork);
+  Future saveTask(Task task) async {
+    debugPrint("SAVE TASK: $task");
+
+    var taskbox = await Hive.openBox('task');
+
+    taskbox.add(task);
   }
 
   Future saveClasswork(Classwork classwork) async {

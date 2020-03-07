@@ -14,40 +14,45 @@ import 'package:jo_study/bloc/task_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
 import 'package:jo_study/model/task.dart';
 import 'package:jo_study/utils/consts.dart';
+import 'package:jo_study/utils/date_utils.dart';
 import 'package:jo_study/widgets/week_day_picker.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'color_picker.dart';
 
-class TaskDialog extends StatelessWidget {
+class TaskDialog extends StatefulWidget {
   final String title, description, buttonText;
-
-  TextEditingController subjController;
-  TextEditingController whenController;
-  TextEditingController noteController;
-
-  Task task;
-
-  BuildContext buildcontext;
-  Bloc bloc;
+  TaskBloc bloc;
 
   TaskDialog(
       {@required this.title,
       @required this.description,
       @required this.buttonText,
-      this.buildcontext,
-      this.bloc});
+      @required this.bloc});
 
   @override
-  Widget build(BuildContext context) {
+  _TaskDialogState createState() => _TaskDialogState();
+}
+
+class _TaskDialogState extends State<TaskDialog> {
+  Task task;
+
+  TextEditingController subjController;
+
+  TextEditingController whenController;
+
+  TextEditingController noteController;
+
+  CalendarController calendarController;
+
+  @override
+  void initState() {
+    super.initState();
+    calendarController = CalendarController();
+
     subjController = TextEditingController();
     whenController = TextEditingController();
     noteController = TextEditingController();
-
-    CalendarController calendarController = CalendarController();
-
-    ValueNotifier<DateTime> startDate = ValueNotifier(DateTime.now());
-    ValueNotifier<DateTime> finishDate = ValueNotifier(DateTime.now());
 
     task = Task();
 
@@ -56,28 +61,83 @@ class TaskDialog extends StatelessWidget {
     });
 
     whenController.addListener(() {
-      task.when = whenController.text;
+      task.date = calendarController.selectedDay;
     });
 
     noteController.addListener(() {
       task.note = noteController.text;
     });
+  }
 
-    ValueNotifier<bool> isEveryWeek = ValueNotifier(false);
+  @override
+  Widget build(BuildContext context) {
+    debugPrint("TASK DIALOG BUILD");
 
-//    final AppBloc bloc = BlocProvider.of<AppBloc>(buildcontext);
-
-    void saveClasswork() {
-      var result = task
-//        ..startDate = DateTime.now()
-//        ..finishDate = DateTime.now()
-//        ..subject = subjController.text
-        ..place = "404"
-        ..tutor = "Kokokoev";
-
-      bloc.add(AddTaskEvent(result));
-
+    void saveTask() {
       Navigator.pop(context);
+      widget.bloc.add(AddTaskEvent(task));
+    }
+
+    void setDate(DateTime day) {
+      debugPrint("DAY: $day");
+      task.date = day;
+      whenController.text = Utils.apiDayFormat(day);
+    }
+
+    void showCalendarDialog() {
+      showGeneralDialog(
+          barrierLabel: '',
+          barrierDismissible: true,
+          context: context,
+          transitionDuration: Duration(milliseconds: 200),
+          transitionBuilder: (context, anim1, anim2, child) {
+            final curvedValue = Curves.easeInOutBack.transform(anim1.value);
+            void onDaySelect(day, list) {
+              setDate(day);
+              Navigator.pop(context, true);
+            }
+
+            var tableCalendar = TableCalendar(
+                headerStyle: HeaderStyle(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(20)),
+                    centerHeaderTitle: true,
+                    formatButtonVisible: false),
+                rowHeight: 50,
+                onDaySelected: (date, list) {
+                  onDaySelect(date, list);
+                },
+                calendarStyle: CalendarStyle(
+                    todayColor: Color(0xffF6AA7B),
+                    markersColor: Color(0xffF6AA7B)),
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                locale: 'ru_RU',
+                calendarController: calendarController);
+
+            return Transform.scale(
+              //              transform: Matrix4.translationValues(0.0, curvedValue * 50, 0.0),
+              scale: curvedValue,
+              //              angle: math.radians(anim1.value * 360),
+              child: Opacity(
+                opacity: anim1.value,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+//                      constraints: BoxConstraints.expand(),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(20)),
+                        height: 400,
+                        width: 400,
+                        child: Material(child: tableCalendar)),
+                  ),
+                ),
+              ),
+            );
+          },
+          pageBuilder: (context, showAnimation, hideAnimation) {});
     }
 
     dialogContent(BuildContext context) {
@@ -107,7 +167,7 @@ class TaskDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min, // To make the card compact
           children: <Widget>[
             Text(
-              title,
+              widget.title,
               style: TextStyle(
 //                fontFamily: "yugothib",
                 color: Color(0xffCC69A6),
@@ -155,54 +215,11 @@ class TaskDialog extends StatelessWidget {
 
             SizedBox(height: 8.0),
 
-            TextFormField(
+            TextField(
               readOnly: true,
               autofocus: false,
               onTap: () {
-                showGeneralDialog(
-                    barrierLabel: '',
-                    barrierDismissible: true,
-                    context: context,
-                    transitionDuration: Duration(milliseconds: 200),
-                    transitionBuilder: (context, anim1, anim2, child) {
-                      final curvedValue =
-                          Curves.easeInOutBack.transform(anim1.value);
-
-                      void onDaySelect(day, list) {
-                        setDate(day);
-                        Navigator.pop(context, true);
-                      }
-
-                      var tableCalendar = TableCalendar(
-
-//                            rowHeight: maxHeight / 6,
-                          onDaySelected: onDaySelect,
-                          calendarStyle: CalendarStyle(
-                              todayColor: Color(0xffF6AA7B),
-                              markersColor: Color(0xffF6AA7B)),
-                          startingDayOfWeek: StartingDayOfWeek.monday,
-                          locale: 'ru_RU',
-                          calendarController: calendarController);
-
-                      return Transform.scale(
-//              transform: Matrix4.translationValues(0.0, curvedValue * 50, 0.0),
-                        scale: curvedValue,
-//              angle: math.radians(anim1.value * 360),
-                        child: Opacity(
-                          opacity: anim1.value,
-                          child: Container(
-                            height: 100,
-                            width: 100,
-                            color: Colors.yellow,
-//                        decoration: BoxDecoration(shape: ContinuousRectangleBorder(side: )),
-                            child: Material(
-                              child: tableCalendar,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    pageBuilder: (context, showAnimation, hideAnimation) {});
+                showCalendarDialog();
               },
 
 //              enabled: false,
@@ -217,6 +234,7 @@ class TaskDialog extends StatelessWidget {
                     ),
                   )),
 //              key: Key(AppKeys.subjInput),
+
               controller: whenController,
             ),
 
@@ -237,21 +255,10 @@ class TaskDialog extends StatelessWidget {
               controller: noteController,
             ),
 
-//            SliderTheme(
-//              data: SliderThemeData(
-//                  rangeTrackShape: RectangularRangeSliderTrackShape()),
-//              child: Slider(
-//                value: 0,
-//                divisions: 10,
-//                min: 0,
-//                max: 100,
-//              ),
-//            ),
-
             FlatButton(
               padding: EdgeInsets.all(16),
               onPressed: () {
-                saveClasswork();
+                saveTask();
               },
               child: Ink(
                   decoration: BoxDecoration(
@@ -265,37 +272,6 @@ class TaskDialog extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(23)),
             )
-
-//          Container(
-//            height: 24,
-//            child: ListView.builder(
-//
-//                scrollDirection: Axis.horizontal,
-//                itemCount: Utils.weekdays.length,
-//                itemBuilder: (context, index) {
-//                  return Container(
-//                    height: 24,
-//                    width: 24,
-//                    child: Text(
-//                      Utils.weekdays[index],
-//                      style: TextStyle(fontSize: 8),
-//                    ),
-//                  );
-//                }
-////
-//                ),
-//          ),
-
-//          SizedBox(height: 24.0),
-//          Align(
-//            alignment: Alignment.bottomRight,
-//            child: FlatButton(
-//              onPressed: () {
-//                Navigator.of(context).pop(); // To close the dialog
-//              },
-//              child: Text(buttonText),
-//            ),
-//          ),
           ],
         ),
       );
@@ -311,13 +287,6 @@ class TaskDialog extends StatelessWidget {
       backgroundColor: Colors.black,
       child: SingleChildScrollView(child: dialogContent(context)),
     );
-  }
-
-  void selectDay(DateTime day) {}
-
-  void setDate(DateTime day) {
-    task.date = day;
-    whenController.text = day.toIso8601String();
   }
 }
 

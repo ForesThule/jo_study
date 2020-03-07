@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:infinite_view_pager/infinite_view_pager.dart';
 import 'package:jo_study/bloc/task_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/model/task.dart';
+import 'package:jo_study/utils/date_utils.dart';
 import 'package:jo_study/widgets/custom_dialog.dart';
 import 'package:vector_math/vector_math.dart' as math;
 
@@ -12,11 +15,21 @@ class TaskScreen extends StatefulWidget {
 }
 
 class _TaskScreenState extends State<TaskScreen> {
+  PageController pageController;
+  var initPageNumber;
+
+  @override
+  void initState() {
+//    initPageNumber = 0;
+
+    pageController = PageController(initialPage: DateTime.now().day - 1);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final TaskBloc bloc = BlocProvider.of<TaskBloc>(context);
-
-    PageController pageController = PageController();
 
     void addTask() {
       debugPrint("ADD TASK");
@@ -37,11 +50,7 @@ class _TaskScreenState extends State<TaskScreen> {
                 opacity: anim1.value,
                 child: TaskDialog(
                   bloc: bloc,
-                  buildcontext: context,
                   title: "Добавить задание",
-                  description:
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                  buttonText: "Okay",
                 ),
               ),
             );
@@ -49,92 +58,105 @@ class _TaskScreenState extends State<TaskScreen> {
           pageBuilder: (context, showAnimation, hideAnimation) {});
     }
 
-    return LayoutBuilder(builder: (context, w) {
-      return Container(
-        width: w.maxWidth,
-        height: w.maxHeight,
-        child: Stack(
-          children: <Widget>[
+    return BlocBuilder(
+        bloc: bloc,
+        builder: (context, state) {
+          if (state is TaskSavedState) {
+            debugPrint("TASK SCREEN BUILDER: $state");
+          }
+
+          return LayoutBuilder(builder: (context, w) {
+            return Container(
+              width: w.maxWidth,
+              height: w.maxHeight,
+              child: Stack(
+                children: <Widget>[
 //    bloc.getClassworksForPeriod(daysInRange);
 
-            StreamBuilder<Map<DateTime, List<Classwork>>>(
-              stream: bloc.getTasksForCurrentMonth(),
-              builder: (context, snapShot) {
-                if (snapShot.hasData) {
-                  debugPrint("CLASSWORKS ON PERIOD ${snapShot.data}");
+                  StreamBuilder<Map<DateTime, List<Task>>>(
+                    stream: bloc.getTasksForCurrentMonth(),
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        debugPrint("TASK FOR MONTH: ${snapShot.data}");
+                        return PageView.builder(
+                          itemCount: snapShot.data.length,
+                          itemBuilder: (ctx, index) {
+                            var day = snapShot.data.keys.toList()[index];
+                            debugPrint("DAY: $day");
+                            var classworksOnDay = snapShot.data[day];
 
-                  snapShot.data.forEach((d, l) {
-                    debugPrint("CLASSWORKS ON PERIOD $d ${l.toString()}");
-                  });
+                            debugPrint("CLASSWORKS ON DAY: $classworksOnDay");
 
-                  debugPrint("snapShot.data.length ${snapShot.data.length}");
-
-                  return PageView.builder(
-                    itemCount: snapShot.data.length,
-                    itemBuilder: (ctx, index) {
-//              snapShot.data
-                      var day = snapShot.data.keys.toList()[index];
-                      debugPrint("DAY: $day");
-
-                      var classworksOnDay = snapShot.data[day];
-                      debugPrint("CLASSWORKS ON DAY: $classworksOnDay");
-
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          color: Colors.deepPurple,
-                          child: classworksOnDay != null
-                              ? ListView.builder(
-                                  itemCount: snapShot.data[day].length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        height: 60,
-                                        color: Colors.pink,
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                color: Colors.deepPurple,
+                                child: classworksOnDay != null
+                                    ? ListView.builder(
+                                        itemCount: snapShot.data[day].length,
+                                        itemBuilder: (context, index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Container(
+                                              height: 60,
+                                              color: Colors.pink,
+                                            ),
+                                          );
+                                        })
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          height: 60,
+                                          color: Colors.orange,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Text(snapShot.data[index]
+                                                .toString()),
+                                          ),
+                                        ),
                                       ),
-                                    );
-                                  })
-                              : Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    height: 60,
-                                    color: Colors.orange,
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child:
-                                          Text(snapShot.data[index].toString()),
-                                    ),
-                                  ),
-                                ),
-                        ),
-                      );
-                    },
+                              ),
+                            );
+                          },
 //      children: week(),
-                    controller: pageController,
-                    scrollDirection: Axis.horizontal,
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            ),
-
-            Positioned(
-              right: 16,
-              bottom: 16,
-              child: FloatingActionButton(
-                  child: Icon(
-                    Icons.add,
-                    size: 30,
-                    color: Colors.white,
+                          controller: pageController,
+                          scrollDirection: Axis.horizontal,
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
                   ),
-                  backgroundColor: Color(0xffCC69A6),
-                  onPressed: addTask),
-            )
-          ],
-        ),
-      );
-    });
+
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
+                    child: FloatingActionButton(
+                        child: Icon(
+                          Icons.add,
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                        backgroundColor: Color(0xffCC69A6),
+                        onPressed: addTask),
+                  )
+                ],
+              ),
+            );
+          });
+        });
+  }
+
+  getCurrentPageNumber(Map<DateTime, List<Classwork>> data) {
+    var now = DateTime.now();
+    var indexOf = data.keys
+        .toList()
+        .map((listday) {
+          return Utils.isSameDay(listday, now);
+        })
+        .toList()
+        .indexOf(true);
+
+    debugPrint("CURRENT PAGE NUMBER: $indexOf");
   }
 }
