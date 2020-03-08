@@ -71,8 +71,6 @@ class _TaskScreenState extends State<TaskScreen> {
               height: w.maxHeight,
               child: Stack(
                 children: <Widget>[
-//    bloc.getClassworksForPeriod(daysInRange);
-
                   StreamBuilder<Map<DateTime, List<Task>>>(
                     stream: bloc.getTasksForCurrentMonth(),
                     builder: (context, snapShot) {

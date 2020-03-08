@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jo_study/app_keys.dart';
 import 'package:jo_study/bloc/day_bloc.dart';
+import 'package:jo_study/bloc/exam_bloc.dart';
 import 'package:jo_study/bloc/month_bloc.dart';
 import 'package:jo_study/bloc/states.dart';
 import 'package:jo_study/bloc/task_bloc.dart';
@@ -42,8 +43,9 @@ class HomeScreen extends StatelessWidget {
       } else if (state is TaskScreenState) {
         return BlocProvider(
             create: (context) => TaskBloc(bloc.repo), child: TaskScreen());
-      } else if (state is ExamState) {
-        return ExamScreen();
+      } else if (state is ExamScreenState) {
+        return BlocProvider(
+            create: (context) => ExamBloc(bloc.repo), child: ExamScreen());
       } else {
         return MonthScreen();
       }
@@ -61,17 +63,6 @@ class HomeScreen extends StatelessWidget {
         return Scaffold(
           appBar: getAppBar(state),
           body: currentStateScreen(state),
-//          floatingActionButton:
-//              BlocBuilder<AppBloc, AppState>(builder: (context, snapshot) {
-//            return FloatingActionButton(
-//              key: AppKeys.addTaskFab,
-//              onPressed: () {
-//                Navigator.pushNamed(context, AppRoutes.addTask);
-//              },
-//              child: Icon(Icons.add),
-//              tooltip: AppBlocLocalizations.of(context).addTask,
-//            );
-//          }),
           bottomNavigationBar: TabSelector(
             activeTab: getActiveTab(state),
             onTabSelected: (tab) {
@@ -95,7 +86,7 @@ class HomeScreen extends StatelessWidget {
       return AppTab.day;
     } else if (state is TaskScreenState) {
       return AppTab.task;
-    } else if (state is ExamState) {
+    } else if (state is ExamScreenState) {
       return AppTab.exam;
     } else {
       return AppTab.month;

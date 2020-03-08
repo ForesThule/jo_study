@@ -8,10 +8,12 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:jo_study/app_keys.dart';
 import 'package:jo_study/bloc/blocs.dart';
 import 'package:jo_study/bloc/events.dart';
+import 'package:jo_study/bloc/exam_bloc.dart';
 import 'package:jo_study/bloc/month_bloc.dart';
 import 'package:jo_study/bloc/states.dart';
 import 'package:jo_study/bloc/task_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/model/exam.dart';
 import 'package:jo_study/model/task.dart';
 import 'package:jo_study/utils/consts.dart';
 import 'package:jo_study/utils/date_utils.dart';
@@ -33,7 +35,6 @@ class TaskDialog extends StatefulWidget {
   @override
   _TaskDialogState createState() => _TaskDialogState();
 }
-
 class _TaskDialogState extends State<TaskDialog> {
   Task task;
 
@@ -289,6 +290,281 @@ class _TaskDialogState extends State<TaskDialog> {
     );
   }
 }
+
+
+
+class ExamDialog extends StatefulWidget {
+  final String title, description, buttonText;
+  ExamBloc bloc;
+
+  ExamDialog(
+      {@required this.title,
+        @required this.description,
+        @required this.buttonText,
+        @required this.bloc});  @override
+
+  _ExamDialogState createState() => _ExamDialogState();
+}
+
+
+class _ExamDialogState extends State<ExamDialog> {
+  Exam task;
+
+  TextEditingController subjController;
+
+  TextEditingController whenController;
+
+  TextEditingController noteController;
+
+  CalendarController calendarController;
+
+  @override
+  void initState() {
+    super.initState();
+    calendarController = CalendarController();
+
+    subjController = TextEditingController();
+    whenController = TextEditingController();
+    noteController = TextEditingController();
+
+    task = Exam();
+
+    subjController.addListener(() {
+      task.subject = subjController.text;
+    });
+
+    whenController.addListener(() {
+      task.date = calendarController.selectedDay;
+    });
+
+    noteController.addListener(() {
+      task.note = noteController.text;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    debugPrint("TASK DIALOG BUILD");
+
+    void saveTask() {
+      Navigator.pop(context);
+      widget.bloc.add(AddExamEvent(task));
+    }
+
+    void setDate(DateTime day) {
+      debugPrint("DAY: $day");
+      task.date = day;
+      whenController.text = Utils.apiDayFormat(day);
+    }
+
+    void showCalendarDialog() {
+      showGeneralDialog(
+          barrierLabel: '',
+          barrierDismissible: true,
+          context: context,
+          transitionDuration: Duration(milliseconds: 200),
+          transitionBuilder: (context, anim1, anim2, child) {
+            final curvedValue = Curves.easeInOutBack.transform(anim1.value);
+            void onDaySelect(day, list) {
+              setDate(day);
+              Navigator.pop(context, true);
+            }
+
+            var tableCalendar = TableCalendar(
+                headerStyle: HeaderStyle(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(20)),
+                    centerHeaderTitle: true,
+                    formatButtonVisible: false),
+                rowHeight: 50,
+                onDaySelected: (date, list) {
+                  onDaySelect(date, list);
+                },
+                calendarStyle: CalendarStyle(
+                    todayColor: Color(0xffF6AA7B),
+                    markersColor: Color(0xffF6AA7B)),
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                locale: 'ru_RU',
+                calendarController: calendarController);
+
+            return Transform.scale(
+              //              transform: Matrix4.translationValues(0.0, curvedValue * 50, 0.0),
+              scale: curvedValue,
+              //              angle: math.radians(anim1.value * 360),
+              child: Opacity(
+                opacity: anim1.value,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+//                      constraints: BoxConstraints.expand(),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(20)),
+                        height: 400,
+                        width: 400,
+                        child: Material(child: tableCalendar)),
+                  ),
+                ),
+              ),
+            );
+          },
+          pageBuilder: (context, showAnimation, hideAnimation) {});
+    }
+
+    dialogContent(BuildContext context) {
+      return Container(
+        key: Key("task_dialog"),
+//        padding: EdgeInsets.only(
+//          top: Cv.avatarRadius,
+//          bottom: Cv.padding,
+//          left: Cv.padding,
+//          right: Cv.padding,
+//        ),
+        margin: EdgeInsets.only(top: Cv.avatarRadius),
+//        decoration: new BoxDecoration(
+//          color: Colors.black,
+//          shape: BoxShape.rectangle,
+//          borderRadius: BorderRadius.circular(20),
+//          border: Border(),
+//          boxShadow: [
+//            BoxShadow(
+//              color: Colors.black26,
+//              blurRadius: 30.0,
+//              offset: const Offset(0, 20.0),
+//            ),
+//          ],
+//        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // To make the card compact
+          children: <Widget>[
+            Text(
+              widget.title,
+              style: TextStyle(
+//                fontFamily: "yugothib",
+                color: Color(0xffCC69A6),
+                fontSize: 24.0,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(2, 8, 2, 2),
+              child: SizedBox(
+                  child: Container(
+                    color: Colors.white12,
+                  ),
+                  height: 1.0),
+            ),
+            TextField(
+              autofocus: false,
+
+              decoration: InputDecoration(
+                  hintText: "Предмет",
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      "assets/flask.png",
+                      height: 24,
+                      width: 24,
+                    ),
+                  )),
+//              key: Key(AppKeys.subjInput),
+              controller: subjController,
+            ),
+//
+//            RangeSlider(
+//              values: RangeValues(),
+//            ),
+
+            SizedBox(height: 8.0),
+
+            ColorPicker(
+              onColorSelected: (color) {
+                debugPrint("ON COLOR SELECT: $color");
+                task.colorValue = color.value;
+              },
+            ),
+
+            SizedBox(height: 8.0),
+
+            TextField(
+              readOnly: true,
+              autofocus: false,
+              onTap: () {
+                showCalendarDialog();
+              },
+
+//              enabled: false,
+              decoration: InputDecoration(
+                  hintText: "Когда",
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      "assets/when_icon.png",
+                      height: 24,
+                      width: 24,
+                    ),
+                  )),
+//              key: Key(AppKeys.subjInput),
+
+              controller: whenController,
+            ),
+
+            SizedBox(height: 8.0),
+            TextField(
+              autofocus: false,
+              decoration: InputDecoration(
+                  hintText: "Заметки",
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.asset(
+                      "assets/clip_attach.png",
+                      height: 24,
+                      width: 24,
+                    ),
+                  )),
+//              key: Key(AppKeys.subjInput),
+              controller: noteController,
+            ),
+
+            FlatButton(
+              padding: EdgeInsets.all(16),
+              onPressed: () {
+                saveTask();
+              },
+              child: Ink(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
+                      gradient: LinearGradient(colors: [
+                        Color(0xffF6A97A),
+                        Color(0xffCD69A6),
+                      ])),
+                  child: Padding(
+                      padding: EdgeInsets.all(12), child: Text("СОХРАНИТЬ"))),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(23)),
+            )
+          ],
+        ),
+      );
+    }
+
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Cv.customDialogPadding),
+      ),
+      elevation: 10,
+      insetAnimationCurve: Curves.elasticInOut,
+      insetAnimationDuration: Duration(milliseconds: 800),
+      backgroundColor: Colors.black,
+      child: SingleChildScrollView(child: dialogContent(context)),
+    );
+  }
+}
+
+
+
 
 class CustomDialog extends StatelessWidget {
   final String title, description, buttonText;

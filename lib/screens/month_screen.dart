@@ -64,55 +64,52 @@ class _MonthScreenState extends State<MonthScreen> {
           selectDay(calendarController.selectedDay);
         }
 
-        return LayoutBuilder(
-          builder: (context, constrain) {
-            var maxHeight = constrain.maxHeight;
+        return SingleChildScrollView(
+          child: LayoutBuilder(
+            builder: (context, constrain) {
+              var maxHeight = constrain.maxHeight;
 //              var classworks = state.classworks;
 
 //              bloc.getClassworksForDate(DateTime.now());
 
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Flexible(
-                  flex: 6,
-                  child: Container(
-                    color: Colors.yellow,
-//                        decoration: BoxDecoration(shape: ContinuousRectangleBorder(side: )),
-                    child: TableCalendar(
-//                            rowHeight: maxHeight / 6,
-                        onDayLongPressed: (DateTime date, list) {
-                          addClasswork(date, list);
-                        },
-                        onDaySelected: (day, list) {
-                          selectDay(day);
-                        },
-                        calendarStyle: CalendarStyle(
-                            todayColor: Color(0xffF6AA7B),
-                            markersColor: Color(0xffF6AA7B)),
-                        startingDayOfWeek: StartingDayOfWeek.monday,
-                        locale: Locale.cachedLocaleString,
-                        calendarController: calendarController),
-                  ),
-                ),
-                StreamBuilder<List<Classwork>>(
-                    stream: bloc.controller.stream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Flexible(
-                          flex: 2,
-                          child: ListView.builder(
-                              itemCount: snapshot.data.length,
-                              itemBuilder: (context, index) =>
-                                  classworkListItem(snapshot.data[index])),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    })
-              ],
-            );
-          },
+             return StreamBuilder<List<Classwork>>(
+                  stream: bloc.controller.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+
+                                  return Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+
+
+                  calendarWidget(addClasswork, selectDay),
+
+                  ...snapshot.data.map((classwork) => classworkListItem(classwork)).toList()
+
+
+                ],
+              );
+
+
+
+
+
+                      return Flexible(
+                        flex: 2,
+                        child: ListView.builder(
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (context, index) =>
+                                classworkListItem(snapshot.data[index])),
+                      );
+                    } else {
+                      return calendarWidget(addClasswork, selectDay);
+                    }
+                  });
+
+
+
+            },
+          ),
         );
 
         return StreamBuilder<List<Classwork>>(
@@ -182,7 +179,7 @@ class _MonthScreenState extends State<MonthScreen> {
                                   todayColor: Color(0xffF6AA7B),
                                   markersColor: Color(0xffF6AA7B)),
                               startingDayOfWeek: StartingDayOfWeek.monday,
-                              locale: Locale.cachedLocaleString,
+                              locale: Locale("ru_Ru"),
                               calendarController: calendarController),
 //              stretch: true,
 //              pinned: true,
@@ -214,6 +211,25 @@ class _MonthScreenState extends State<MonthScreen> {
 //        }
       },
     );
+  }
+
+  TableCalendar calendarWidget(addClasswork(DateTime date, List list), void selectDay(DateTime day)) {
+    return TableCalendar(
+//                            rowHeight: maxHeight / 6,
+                      availableGestures: AvailableGestures.none,
+                      onDayLongPressed: (DateTime date, list) {
+                        addClasswork(date, list);
+                      },
+                      onDaySelected: (day, list) {
+                        selectDay(day);
+                      },
+                      headerStyle: HeaderStyle(formatButtonVisible: false,centerHeaderTitle: true),
+                      calendarStyle: CalendarStyle(
+                          todayColor: Color(0xffF6AA7B),
+                          markersColor: Color(0xffF6AA7B)),
+                      startingDayOfWeek: StartingDayOfWeek.monday,
+                      locale: "ru_Ru",
+                      calendarController: calendarController);
   }
 
   Padding classworkListItem(Classwork classwork) {

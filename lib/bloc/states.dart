@@ -16,7 +16,7 @@ class Month extends AppState {}
 
 class Day extends AppState {}
 
-class ExamState extends AppState {}
+class ExamScreenState extends AppState {}
 
 class TaskScreenState extends AppState {}
 

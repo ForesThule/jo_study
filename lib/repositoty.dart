@@ -2,6 +2,7 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/model/exam.dart';
 import 'package:jo_study/utils/date_utils.dart';
 
 import 'model/task.dart';
@@ -71,6 +72,29 @@ class AppRepository {
     yield mapResult;
   }
 
+  Stream<Map<DateTime, List<Exam>>> getExamsForPeriod(List<DateTime> thisMonth) async* {
+
+    debugPrint("PERIOD: ${thisMonth}");
+
+    var taskbox = await Hive.openBox('exam');
+
+    List<Exam> allTasks = [...taskbox.values];
+
+    Map<DateTime, List<Exam>> mapResult = {};
+
+    for (var day in thisMonth) {
+      List<Exam> tasks = allTasks
+          .where((task) =>
+      null != task.date ? Utils.isSameDay(task.date, day) : false)
+          .toList();
+
+      mapResult[day] = tasks;
+    }
+
+    yield mapResult;
+  }
+
+
   Stream<List<Classwork>> classworksForDay(DateTime day) async* {
     debugPrint("CHECK DateTime: ${day}");
 
@@ -130,4 +154,16 @@ class AppRepository {
 //
 //    debugPrint("CHECK SAVED CLASSWORK ${classworkbox.containsKey(classwork)}");
   }
+
+  Future saveExam(Exam exam) async {
+
+
+    var box = await Hive.openBox('exam');
+
+    var i = await box.add(exam);
+
+    debugPrint("CHECK SAVED EXAM ${box.containsKey(exam)}");
+
+  }
+
 }
