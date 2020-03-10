@@ -81,23 +81,26 @@ class _TaskScreenState extends State<TaskScreen> {
                           itemBuilder: (ctx, index) {
                             var day = snapShot.data.keys.toList()[index];
                             debugPrint("DAY: $day");
-                            var classworksOnDay = snapShot.data[day];
+                            var tasks = snapShot.data[day];
 
-                            debugPrint("CLASSWORKS ON DAY: $classworksOnDay");
+                            debugPrint("task ON DAY: $tasks");
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
-                                color: Colors.deepPurple,
-                                child: classworksOnDay != null
+                                child: tasks != null
                                     ? ListView.builder(
                                         itemCount: snapShot.data[day].length,
                                         itemBuilder: (context, index) {
+                                          var task = tasks[index];
                                           return Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Container(
-                                              height: 60,
-                                              color: Colors.pink,
+                                            child: ListTile(
+                                              leading: CircleAvatar(radius: 24,backgroundColor: Color(task.colorValue),),
+                                              title: Text(task.subject??"-"),
+                                              subtitle:Text(task.note??"-"),
+                                              trailing: Text("${Utils.apiDayFormat(task.date)}"),
+
                                             ),
                                           );
                                         })

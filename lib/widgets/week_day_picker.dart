@@ -5,15 +5,25 @@ import 'package:jo_study/utils/consts.dart';
 import 'package:jo_study/utils/date_utils.dart';
 
 class WeekDayPicker extends StatefulWidget {
-  @override
+DateTime currentDate;
+Set<int> pickedDay;
+
+WeekDayPicker(this.currentDate, this.pickedDay);
+
+@override
   _WeekDayPickerState createState() => _WeekDayPickerState();
 }
 
 class _WeekDayPickerState extends State<WeekDayPicker> {
-  Set<String> pickedDay = {};
 
   @override
+  void initState() {
+    widget.pickedDay.add(widget.currentDate.weekday-1);
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: Utils.weekdays.map((day) {
@@ -22,21 +32,21 @@ class _WeekDayPickerState extends State<WeekDayPicker> {
           child: GestureDetector(
             onTap: () {
               setState(() {
-                if (pickedDay.contains(day)) {
-                  pickedDay.remove(day);
+                if (widget.pickedDay.contains(getIndexOfDay(day))) {
+                  widget.pickedDay.remove(getIndexOfDay(day));
                 } else {
-                  pickedDay.add(day);
+                  widget.pickedDay.add(getIndexOfDay(day));
                 }
               });
             },
             child: Container(
-              color: pickedDay.contains(day) ? Colors.blue : Color(0xff828282),
-              height: 36,
-              width: 36,
+              color: widget.pickedDay.contains(getIndexOfDay(day)) ? Colors.white70:Colors.white12 ,
+              height: 40,
+              width: 40,
               child: Center(
                 child: Text(
                   day,
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ),
@@ -45,4 +55,6 @@ class _WeekDayPickerState extends State<WeekDayPicker> {
       }).toList(),
     );
   }
+
+  int getIndexOfDay(String day) => Utils.weekdays.indexOf(day);
 }

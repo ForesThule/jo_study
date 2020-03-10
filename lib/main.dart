@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_file.dart';
 import 'package:jo_study/bloc/blocs.dart';
@@ -12,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'model/classwork.dart';
+import 'model/exam.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +31,8 @@ void main() async {
   Hive
     ..init(appDocDirectory.path)
     ..registerAdapter(ClassworkAdapter())
-    ..registerAdapter(TaskAdapter());
+    ..registerAdapter(TaskAdapter())
+    ..registerAdapter(ExamAdapter());
 
   runApp(MyApp());
 }
@@ -55,8 +58,30 @@ class MyApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         title: 'Flutter Demo',
-        themeMode: ThemeMode.dark,
-        darkTheme: ThemeData.dark(),
+
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          primaryColor: Colors.lightBlue[800],
+          accentColor: Colors.cyan[600],
+          scaffoldBackgroundColor: Colors.black54,
+          appBarTheme: AppBarTheme(brightness: Brightness.dark,color: Colors.black54),
+//          colorScheme: ColorScheme.dark(),
+
+          fontFamily: 'Raleway',
+
+          textTheme: TextTheme(
+            headline5: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+            headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
+          ),
+        ),
+//        darkTheme: ThemeData.dark(),
+
+//        darkTheme: ThemeData(
+//            textTheme: GoogleFonts.lobsterTextTheme(
+//          Theme.of(context).textTheme,
+//        )),
+
+
 //        theme: ThemeData(
 //          primarySwatch: Colors.grey,
 //        ),

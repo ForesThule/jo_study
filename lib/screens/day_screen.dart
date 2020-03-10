@@ -11,6 +11,7 @@ import 'package:jo_study/bloc/month_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
 import 'package:jo_study/utils/date_utils.dart';
 import 'package:jo_study/widgets/horizontal_wheel.dart';
+import 'package:page_view_indicators/step_page_indicator.dart';
 
 class DayScreen extends StatefulWidget {
   @override
@@ -80,7 +81,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   }
 
   PageController pageController;
-  ValueNotifier<int> curentPage;
+  ValueNotifier<int> curentPageNotifier;
 
 //  int currentPage;
 
@@ -93,7 +94,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
   void initState() {
 //    classworksForDate = StreamController.broadcast();
 
-    curentPage = ValueNotifier(0);
+    curentPageNotifier = ValueNotifier(0);
     currenttime = new DateTime.now();
     start = currenttime.subtract(new Duration(days: 7));
     end = currenttime.add(new Duration(days: 7));
@@ -102,14 +103,14 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
     for (var i = 0; i < daysInRange.length; i++) {
       var day = daysInRange[i];
       if (day.day == currenttime.day) {
-        curentPage.value = i;
+        curentPageNotifier.value = i;
       }
     }
     _tabs = getTabs(_startingTabCount);
     _tabController = getTabController();
 
-    pageController =
-        PageController(initialPage: curentPage.value, viewportFraction: 1);
+    pageController = PageController(
+        initialPage: curentPageNotifier.value, viewportFraction: 1);
 
 //    pageController.addListener(() {
 //      var page = pageController.page;
@@ -139,6 +140,7 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
           debugPrint("snapShot.data.length ${snapShot.data.length}");
 
           return PageView.builder(
+            pageSnapping: true,
             itemCount: snapShot.data.length,
             itemBuilder: (ctx, index) {
 //              snapShot.data
@@ -151,16 +153,30 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  color: Colors.deepPurple,
                   child: classworksOnDay != null
                       ? ListView.builder(
-                          itemCount: snapShot.data[day].length,
+                          itemCount: classworksOnDay.length,
                           itemBuilder: (context, index) {
+                            var classwork = classworksOnDay[index];
+
+                            var startDate = classwork.startDate;
+                            var finishDate = classwork.finishDate;
+
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 height: 60,
-                                color: Colors.pink,
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor:
+                                        Color(classwork.colorValue),
+                                  ),
+                                  title: Text(classwork.subject ?? "-"),
+                                  subtitle: Text(classwork.place ?? "-"),
+                                  trailing: Text(
+                                      "${Utils.apiDayFormat(startDate)} - ${Utils.apiDayFormat(finishDate)}"),
+                                ),
                               ),
                             );
                           })
@@ -195,3 +211,19 @@ class _DayScreenState extends State<DayScreen> with TickerProviderStateMixin {
     );
   }
 }
+//Container(
+//                color: Colors.black,
+//                padding: const EdgeInsets.all(16.0),
+//                child: StepPageIndicator(
+//                  previousStep: Text("sdsdsds"),
+//                  nextStep: Text("sdsdsds"),
+//                  selectedStep: Text("sdsdsds"),
+//                  itemCount: 3,
+//                  currentPageNotifier: curentPageNotifier,
+//                  size: 16,
+//                  onPageSelected: (int index) {
+//                    if (curentPageNotifier.value > index)
+//                      pageController.jumpToPage(index);
+//                  },
+//                ),
+//              ),

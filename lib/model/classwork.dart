@@ -24,7 +24,7 @@ class Classwork extends Equatable {
   String subject;
 
   @HiveField(3)
-  String tutor;
+  String teacher;
 
   @HiveField(4)
   String place;
@@ -53,7 +53,7 @@ class Classwork extends Equatable {
       isEveryWeekShow: isEveryWeekShow ?? this.isEveryWeekShow,
       id: id ?? this.id,
       subject: subject ?? this.subject,
-      tutor: tutor ?? this.tutor,
+      tutor: tutor ?? this.teacher,
       place: place ?? this.place,
       startDate: startDate ?? this.startDate,
       finishDate: finishDate ?? this.finishDate,
@@ -72,7 +72,7 @@ class Classwork extends Equatable {
     int colorValue,
   })  : this.id = id ?? Uuid().v4(),
         this.subject = subject,
-        this.tutor = tutor,
+        this.teacher = tutor,
         this.isEveryWeekShow = isEveryWeekShow,
         this.place = place,
         this.startDate = startDate,
@@ -84,7 +84,7 @@ class Classwork extends Equatable {
         isEveryWeekShow,
         id,
         subject,
-        tutor,
+        teacher,
         place,
         startDate,
         finishDate,
@@ -93,7 +93,7 @@ class Classwork extends Equatable {
 
   @override
   String toString() {
-    return 'Classwork{id: $id, isEveryWeekShow: $isEveryWeekShow, subject: $subject, tutor: $tutor, place: $place, startDate: $startDate, finishDate: $finishDate, colorValue: $colorValue}';
+    return 'Classwork{id: $id, isEveryWeekShow: $isEveryWeekShow, subject: $subject, tutor: $teacher, place: $place, startDate: $startDate, finishDate: $finishDate, colorValue: $colorValue}';
   }
 
   Classwork toEntity() {
@@ -102,7 +102,7 @@ class Classwork extends Equatable {
         isEveryWeekShow: isEveryWeekShow,
         place: place,
         subject: subject,
-        tutor: tutor,
+        tutor: teacher,
         startDate: startDate,
         finishDate: finishDate,
         colorValue: colorValue);
@@ -113,7 +113,7 @@ class Classwork extends Equatable {
       startDate: entity.startDate,
       finishDate: entity.finishDate,
       place: entity.place,
-      tutor: entity.tutor,
+      tutor: entity.teacher,
       isEveryWeekShow: entity.isEveryWeekShow,
       id: entity.id ?? Uuid().v4(),
       colorValue: entity.colorValue,

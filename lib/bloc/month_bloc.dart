@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:jo_study/bloc/states.dart';
 import 'package:jo_study/model/classwork.dart';
 
+
 import '../repositoty.dart';
 
 class MonthBloc extends Bloc<MonthEvent, MonthState> {
@@ -47,12 +48,14 @@ class MonthBloc extends Bloc<MonthEvent, MonthState> {
 //  }
 
   Stream<MonthState> addClasswork(AddClassworkEvent event) async* {
-    await saveClasswork(event.classwork);
+    debugPrint("ADD CLASSWORK ${event.classwork}");
+    debugPrint("ADD CLASSWORK ${event.pickedDays}");
+    await saveClasswork(event.classwork, event.pickedDays);
     yield ClassworkSaved(event.classwork);
   }
 
-  Future saveClasswork(Classwork classwork) {
-    return repo.saveClasswork(classwork);
+  Future saveClasswork(Classwork classwork, Set<int> pickedDays) {
+    return repo.saveClasswork(classwork,pickedDays);
   }
 
   getCurrentDateClasswork() {}
@@ -140,8 +143,9 @@ class ShowClassworkForDay extends MonthEvent {
 
 class AddClassworkEvent extends MonthEvent {
   final Classwork classwork;
+  final Set<int> pickedDays;
 
-  const AddClassworkEvent(this.classwork);
+  const AddClassworkEvent(this.classwork, this.pickedDays);
 
   @override
   List<Object> get props => [classwork];

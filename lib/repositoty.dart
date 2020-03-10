@@ -72,28 +72,29 @@ class AppRepository {
     yield mapResult;
   }
 
-  Stream<Map<DateTime, List<Exam>>> getExamsForPeriod(List<DateTime> thisMonth) async* {
+  Future saveExam(Exam exam) async {
+    debugPrint("REPOSITORY SAVE EXAM: $exam");
+    var box = await Hive.openBox('exam');
+    box.add(exam);
+    debugPrint("CHECK SAVED EXAM ${box.containsKey(exam)}");
+  }
 
+  Stream<Map<DateTime, List<Exam>>> getExamsForPeriod(
+      List<DateTime> thisMonth) async* {
     debugPrint("PERIOD: ${thisMonth}");
-
-    var taskbox = await Hive.openBox('exam');
-
-    List<Exam> allTasks = [...taskbox.values];
-
+    var box = await Hive.openBox('exam');
+    List<Exam> allTasks = [...box.values];
     Map<DateTime, List<Exam>> mapResult = {};
-
     for (var day in thisMonth) {
       List<Exam> tasks = allTasks
           .where((task) =>
-      null != task.date ? Utils.isSameDay(task.date, day) : false)
+              null != task.date ? Utils.isSameDay(task.date, day) : false)
           .toList();
-
       mapResult[day] = tasks;
     }
 
     yield mapResult;
   }
-
 
   Stream<List<Classwork>> classworksForDay(DateTime day) async* {
     debugPrint("CHECK DateTime: ${day}");
@@ -130,12 +131,39 @@ class AppRepository {
     taskbox.add(task);
   }
 
-  Future saveClasswork(Classwork classwork) async {
+  Future saveClasswork(Classwork classwork, Set<int> pickedDays) async {
     debugPrint("CHECK CLASSWORK FOR SAVE: ${classwork}");
 
     var classworkbox = await Hive.openBox('classwork');
 
-    var i = await classworkbox.add(classwork);
+    if (classwork.isEveryWeekShow) {
+
+      Utils.daysInRange(Utils.firstDayOfMonth(classwork.startDate), Utils.lastDayOfMonth(classwork.startDate))
+//      Utils.daysInMonth(classwork.startDate)
+          .where((element) => element.weekday==classwork.startDate.weekday)
+          .forEach((day) {
+        var classworkCopy = classwork.copyWith(
+          startDate: DateTime(
+            classwork.startDate.year,
+            day.month,
+            day.day,
+            classwork.startDate.hour,
+            classwork.startDate.minute,
+          ),
+          finishDate: DateTime(
+            classwork.finishDate.year,
+            day.month,
+            day.day,
+            classwork.finishDate.hour,
+            classwork.finishDate.minute,
+          ),
+        );
+
+        classworkbox.add(classworkCopy);
+      });
+    }else{
+  classworkbox.add(classwork);
+    }
 
     debugPrint("CHECK SAVED CLASSWORK ${classworkbox.containsKey(classwork)}");
   }
@@ -154,16 +182,4 @@ class AppRepository {
 //
 //    debugPrint("CHECK SAVED CLASSWORK ${classworkbox.containsKey(classwork)}");
   }
-
-  Future saveExam(Exam exam) async {
-
-
-    var box = await Hive.openBox('exam');
-
-    var i = await box.add(exam);
-
-    debugPrint("CHECK SAVED EXAM ${box.containsKey(exam)}");
-
-  }
-
 }

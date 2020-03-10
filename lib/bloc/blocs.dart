@@ -18,7 +18,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   AppBloc({@required this.repo});
 
   @override
-  AppState get initialState => Month();
+  AppState get initialState => MonthHomeScreenState();
 
   @override
   Stream<AppState> mapEventToState(AppEvent event) async* {
@@ -60,7 +60,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   _mapMonthToState() {
-    return Month();
+    return MonthHomeScreenState();
   }
 
   Stream<AppState> _mapSelectedTabScreen(ShowTabScreen event) async* {
@@ -68,19 +68,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     switch (event.tab) {
       case AppTab.month:
-        yield Month();
+        yield MonthHomeScreenState();
         break;
       case AppTab.day:
-        yield Day();
+        yield DayHomeScreenState();
         break;
       case AppTab.week:
-        yield Week();
+        yield WeekHomeScreenState();
         break;
       case AppTab.task:
-        yield TaskScreenState();
+        yield TaskHomeScreenState();
         break;
       case AppTab.exam:
-        yield ExamScreenState();
+        yield ExamHomeScreenState();
         break;
     }
   }

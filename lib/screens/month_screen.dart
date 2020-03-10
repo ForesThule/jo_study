@@ -6,8 +6,11 @@ import 'package:jo_study/bloc/blocs.dart';
 import 'package:jo_study/bloc/events.dart';
 import 'package:jo_study/bloc/month_bloc.dart';
 import 'package:jo_study/model/classwork.dart';
+import 'package:jo_study/utils/date_utils.dart';
 import 'package:jo_study/widgets/custom_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:date_format/date_format.dart';
+
 
 class MonthScreen extends StatefulWidget {
   @override
@@ -44,7 +47,7 @@ class _MonthScreenState extends State<MonthScreen> {
         builder: (BuildContext context) => CustomDialog(
           bloc: bloc,
           buildcontext: context,
-          date: date,
+          currentDate: date,
           title: "Добавить занятие",
           description:
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -64,175 +67,73 @@ class _MonthScreenState extends State<MonthScreen> {
           selectDay(calendarController.selectedDay);
         }
 
-        return SingleChildScrollView(
-          child: LayoutBuilder(
-            builder: (context, constrain) {
-              var maxHeight = constrain.maxHeight;
+        return Scaffold(
+          backgroundColor: Colors.blueGrey,
+          body: SingleChildScrollView(
+            child: LayoutBuilder(
+              builder: (context, constrain) {
+                var maxHeight = constrain.maxHeight;
 //              var classworks = state.classworks;
 
 //              bloc.getClassworksForDate(DateTime.now());
 
-             return StreamBuilder<List<Classwork>>(
-                  stream: bloc.controller.stream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                return StreamBuilder<List<Classwork>>(
+                    stream: bloc.controller.stream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            calendarWidget(addClasswork, selectDay),
 
-                                  return Column(
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-
-
-                  calendarWidget(addClasswork, selectDay),
-
-                  ...snapshot.data.map((classwork) => classworkListItem(classwork)).toList()
-
-
-                ],
-              );
-
-
-
-
-
-                      return Flexible(
-                        flex: 2,
-                        child: ListView.builder(
-                            itemCount: snapshot.data.length,
-                            itemBuilder: (context, index) =>
-                                classworkListItem(snapshot.data[index])),
-                      );
-                    } else {
-                      return calendarWidget(addClasswork, selectDay);
-                    }
-                  });
-
-
-
-            },
+                            Center(
+//                              child: Text("${Utils.apiDayFormat(calendarController.selectedDay)}")
+                              child: Text("${formatDate(calendarController.selectedDay, [yyyy, '-', M, '-', d])}")
+                              ,),
+                            ...snapshot.data
+                                .map((classwork) => classworkListItem(classwork))
+                                .toList()
+                          ],
+                        );
+                      } else {
+                        return calendarWidget(addClasswork, selectDay);
+                      }
+                    });
+              },
+            ),
           ),
         );
-
-        return StreamBuilder<List<Classwork>>(
-            stream: bloc.repo.classworksForDay(calendarController.selectedDay),
-            builder: (context, snapshot) {
-              debugPrint("SNAPSHOT: $snapshot");
-
-              if (snapshot.hasData) {
-//
-//
-//                return CustomScrollView(
-//                  slivers: <Widget>[
-//                    SliverAppBar(
-//                      stretch: true,
-//
-//                      expandedHeight: w.maxHeight / 2,
-//                      flexibleSpace: ,
-////              stretch: true,
-////              pinned: true,
-////              automaticallyImplyLeading: true,
-//                      shape: ContinuousRectangleBorder(
-//                          borderRadius: BorderRadius.only(
-//                              bottomLeft: Radius.circular(100),
-//                              bottomRight: Radius.circular(100))),
-////              leading:
-//                    ),
-//                    SliverList(
-//                      delegate: SliverChildBuilderDelegate((ctx, index) {
-//                        return Padding(
-//                          padding: const EdgeInsets.all(8.0),
-//                          child: Container(
-//                            height: 24,
-//                            width: 100,
-//                            color: Colors.blue,
-//                          ),
-//                        );
-//                      }, childCount: snapshot.data.length),
-//                    )
-//                  ],
-//                );
-//              },
-//            );
-
-                return Container(
-                  height: 24,
-                  width: 100,
-                  color: Colors.blue,
-                );
-              } else {
-                return LayoutBuilder(
-                  builder: (ctx, w) {
-                    return CustomScrollView(
-                      slivers: <Widget>[
-                        SliverAppBar(
-                          stretch: true,
-
-                          expandedHeight: w.maxHeight / 2,
-                          flexibleSpace: TableCalendar(
-                              rowHeight: 12,
-                              onDayLongPressed: (DateTime date, list) {
-                                addClasswork(date, list);
-                              },
-                              onDaySelected: (day, list) {
-                                selectDay(day);
-                              },
-                              calendarStyle: CalendarStyle(
-                                  todayColor: Color(0xffF6AA7B),
-                                  markersColor: Color(0xffF6AA7B)),
-                              startingDayOfWeek: StartingDayOfWeek.monday,
-                              locale: Locale("ru_Ru"),
-                              calendarController: calendarController),
-//              stretch: true,
-//              pinned: true,
-//              automaticallyImplyLeading: true,
-                          shape: ContinuousRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(100),
-                                  bottomRight: Radius.circular(100))),
-//              leading:
-                        ),
-                      ],
-                    );
-                  },
-                );
-
-                return ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, s) {
-                      return Container(
-                        height: 24,
-                        width: 100,
-                        color: Colors.blue,
-                      );
-                    });
-              }
-            });
-//        } else {
-//          return Container();
-//        }
       },
     );
   }
 
-  TableCalendar calendarWidget(addClasswork(DateTime date, List list), void selectDay(DateTime day)) {
+  TableCalendar calendarWidget(
+      addClasswork(DateTime date, List list), void selectDay(DateTime day)) {
     return TableCalendar(
-//                            rowHeight: maxHeight / 6,
-                      availableGestures: AvailableGestures.none,
-                      onDayLongPressed: (DateTime date, list) {
-                        addClasswork(date, list);
-                      },
-                      onDaySelected: (day, list) {
-                        selectDay(day);
-                      },
-                      headerStyle: HeaderStyle(formatButtonVisible: false,centerHeaderTitle: true),
-                      calendarStyle: CalendarStyle(
-                          todayColor: Color(0xffF6AA7B),
-                          markersColor: Color(0xffF6AA7B)),
-                      startingDayOfWeek: StartingDayOfWeek.monday,
-                      locale: "ru_Ru",
-                      calendarController: calendarController);
+        availableGestures: AvailableGestures.none,
+        onDayLongPressed: (DateTime date, list) {
+          addClasswork(date, list);
+        },
+        onDaySelected: (day, list) {
+          selectDay(day);
+        },
+        headerStyle:
+            HeaderStyle(
+
+                leftChevronIcon: Icon(Icons.arrow_back_ios),
+                rightChevronIcon: Icon(Icons.arrow_forward_ios),
+
+                formatButtonVisible: false, centerHeaderTitle: true),
+        calendarStyle: CalendarStyle(
+            todayColor: Color(0xffF6AA7B), markersColor: Color(0xffF6AA7B)),
+        startingDayOfWeek: StartingDayOfWeek.monday,
+        locale: "ru_Ru",
+        calendarController: calendarController);
   }
 
   Padding classworkListItem(Classwork classwork) {
+    var startDate = classwork.startDate;
+    var finishDate = classwork.finishDate;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListTile(
@@ -243,31 +144,19 @@ class _MonthScreenState extends State<MonthScreen> {
               : Colors.yellow,
         ),
         trailing: Container(
-          height: 36,
-          width: 100,
-          child: Text("описание"),
+          child: Text(
+              "${startDate.hour}:${startDate.minute} - ${finishDate.hour}:${finishDate.minute}"),
         ),
         title: Container(
-          height: 36,
-          width: 100,
-          child: classwork.subject != null
-              ? Text(classwork.subject)
-              : Text("Предмет"),
+          child: Center(
+              child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    classwork.subject ?? "Предмет",
+                    style: TextStyle(fontSize: 24),
+                  ))),
         ),
       ),
     );
   }
 }
-
-//child: StreamBuilder<List<Classwork>>(
-//stream:
-//bloc.repo.classworksForDay(calendarController.selectedDay),
-//builder: (context, snapshot) {
-//if (snapshot.hasData) {
-//return Container();
-//} else {
-//return ListView.builder(
-//itemCount: snapshot.data.length,
-//itemBuilder: (context, s) {});
-//}
-//}),

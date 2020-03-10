@@ -19,7 +19,7 @@ class ClassworkAdapter extends TypeAdapter<Classwork> {
     return Classwork()
       ..isEveryWeekShow = fields[1] as bool
       ..subject = fields[2] as String
-      ..tutor = fields[3] as String
+      ..teacher = fields[3] as String
       ..place = fields[4] as String
       ..startDate = fields[5] as DateTime
       ..finishDate = fields[6] as DateTime
@@ -37,7 +37,7 @@ class ClassworkAdapter extends TypeAdapter<Classwork> {
       ..writeByte(2)
       ..write(obj.subject)
       ..writeByte(3)
-      ..write(obj.tutor)
+      ..write(obj.teacher)
       ..writeByte(4)
       ..write(obj.place)
       ..writeByte(5)

@@ -64,14 +64,14 @@ class WeekBloc extends Bloc<WeekEvent, WeekState> {
 //    yield ClassworksForDay();
 //  }
 
-  Stream<WeekState> addClasswork(AddClassworkEvent event) async* {
-    await saveClasswork(event.classwork);
-    yield ClassworkSaved(event.classwork);
-  }
+//  Stream<WeekState> addClasswork(AddClassworkEvent event) async* {
+//    await saveClasswork(event.classwork);
+//    yield ClassworkSaved(event.classwork);
+//  }
 
-  Future saveClasswork(Classwork classwork) {
-    return repo.saveClasswork(classwork);
-  }
+//  Future saveClasswork(Classwork classwork) {
+//    return repo.saveClasswork(classwork);
+//  }
 
   getCurrentDateClasswork() {}
 }

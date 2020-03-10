@@ -50,7 +50,7 @@ class ColorPickerState extends State<ColorPicker> {
     }
 
     if (_subColorSelected == null) {
-      _selectColor(null, Colors.black, false);
+      _selectColor(null, Color(0xFFE942A9), false);
     }
   }
 

@@ -35,6 +35,7 @@ class Utils {
     "ВС"
   ];
 
+
   /// The list of days in a given month
   static List<DateTime> daysInMonth(DateTime month) {
     var first = firstDayOfMonth(month);
@@ -73,7 +74,7 @@ class Utils {
     /// Weekday is on a 1-7 scale Monday - Sunday,
     /// This Calendar works from Sunday - Monday
     var decreaseNum = day.weekday % 7;
-    return day.subtract(new Duration(days: decreaseNum +1));
+    return day.subtract(new Duration(days: decreaseNum-1));
   }
 
   static DateTime lastDayOfWeek(DateTime day) {
@@ -84,7 +85,7 @@ class Utils {
     /// Weekday is on a 1-7 scale Monday - Sunday,
     /// This Calendar's Week starts on Sunday
     var increaseNum = day.weekday % 7;
-    return day.add(new Duration(days: 7 - increaseNum + 1));
+    return day.add(new Duration(days: 8 - increaseNum));
   }
 
   /// The last day of a given month

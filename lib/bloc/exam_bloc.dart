@@ -40,16 +40,17 @@ class ExamBloc extends Bloc<ExamEvent, ExamState> {
   @override
   Stream<ExamState> mapEventToState(ExamEvent event) async* {
     if (event is AddExamEvent) {
+      debugPrint("ADD EXAM EVENT: $event");
       await saveExam(event.exam);
       yield ExamSavedState();
     }
   }
 
-  Future saveClasswork(Classwork classwork) {
-    return repo.saveClasswork(classwork);
-  }
+//  Future saveClasswork(Classwork classwork) {
+//    return repo.saveClasswork(classwork);
+//  }
 
-  Future saveExam(Exam exam) {
+  Future saveExam(Exam exam)async {
     return repo.saveExam(exam);
   }
 

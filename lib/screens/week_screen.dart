@@ -94,14 +94,12 @@ class _WeekScreenState extends State<WeekScreen> {
 
               return SingleChildScrollView(
                 child: Container(
-                  color: Colors.black54,
                   child: buildColumns(snap.data),
 //                  buildBody(extractTableRows, snap),
                 ),
               );
             } else {
               return Container(
-                color: Colors.purpleAccent,
               );
             }
           },
@@ -135,7 +133,7 @@ class _WeekScreenState extends State<WeekScreen> {
                     var startDate = classwork.startDate;
 
                     return Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+                      padding: const EdgeInsets.fromLTRB(2, 2, 2, 2),
                       child: Container(
 //                        child: Text("${startDate.hour}:${startDate.minute}"),
                         height: 50,
@@ -157,6 +155,7 @@ class _WeekScreenState extends State<WeekScreen> {
 
   Table buildBody(
       List<TableRow> extractTableRows(Map<DateTime, List<Classwork>> map),
+
       AsyncSnapshot<Map<DateTime, List<Classwork>>> snap) {
     return Table(
       border: TableBorder.all(),
@@ -166,24 +165,7 @@ class _WeekScreenState extends State<WeekScreen> {
                 .map((day) => Center(child: Text(Utils.weekdays[day])))
                 .toList()),
 
-        ...extractTableRows(snap.data),
-
-//
-//                      ...List.generate(
-//                          maxlength,
-//                          (index) => TableRow(
-//                                  children: Cv.days.map((day) {
-//                                var weekDay =
-//                                    snap.data.keys.firstWhere((keyDay) {
-//                                  keyDay.day == day;
-//                                });
-//
-//                                return Container(
-//                                  child: Text(day.toString()),
-//                                  height: 80,
-//                                  color: Colors.yellow,
-//                                );
-//                              }).toList()))
+        ...extractTableRows(snap.data)
       ],
     );
   }

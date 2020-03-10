@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jo_study/bloc/exam_bloc.dart';
 import 'package:jo_study/model/exam.dart';
+import 'package:jo_study/utils/date_utils.dart';
 import 'package:jo_study/widgets/custom_dialog.dart';
 
 class ExamScreen extends StatefulWidget {
@@ -18,8 +19,6 @@ class _ExamScreenState extends State<ExamScreen> {
 
   @override
   void initState() {
-//    initPageNumber = 0;
-
     pageController = PageController(initialPage: DateTime.now().day - 1);
 
     super.initState();
@@ -64,7 +63,7 @@ class _ExamScreenState extends State<ExamScreen> {
         bloc: bloc,
         builder: (context, state) {
           if (state is ExamSavedState) {
-            debugPrint("TASK SCREEN BUILDER: $state");
+            debugPrint("EXAM SCREEN BUILDER: $state");
           }
 
           return LayoutBuilder(builder: (context, w) {
@@ -79,29 +78,34 @@ class _ExamScreenState extends State<ExamScreen> {
                     stream: bloc.getExamsForCurrentMonth(),
                     builder: (context, snapShot) {
                       if (snapShot.hasData) {
-                        debugPrint("TASK FOR MONTH: ${snapShot.data}");
+                        debugPrint("EXAMS FOR MONTH: ${snapShot.data}");
                         return PageView.builder(
                           itemCount: snapShot.data.length,
                           itemBuilder: (ctx, index) {
                             var day = snapShot.data.keys.toList()[index];
                             debugPrint("DAY: $day");
-                            var classworksOnDay = snapShot.data[day];
+                            var exams = snapShot.data[day];
 
-                            debugPrint("CLASSWORKS ON DAY: $classworksOnDay");
+                            debugPrint("EXAMS ON DAY: $exams");
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
-                                color: Colors.deepPurple,
-                                child: classworksOnDay != null
+                                child: exams != null
                                     ? ListView.builder(
                                     itemCount: snapShot.data[day].length,
                                     itemBuilder: (context, index) {
+                                      var exam = exams[index];
+
+
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          height: 60,
-                                          color: Colors.pink,
+                                        child: ListTile(
+                                          leading: CircleAvatar(radius: 24,backgroundColor: Color(exam.colorValue),),
+                                          title: Text(exam.subject??"-"),
+                                          subtitle:Text(exam.note??"-"),
+                                              trailing: Text("${Utils.apiDayFormat(exam.date)}"),
+
                                         ),
                                       );
                                     })

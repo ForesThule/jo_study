@@ -35,6 +35,7 @@ class TaskDialog extends StatefulWidget {
   @override
   _TaskDialogState createState() => _TaskDialogState();
 }
+
 class _TaskDialogState extends State<TaskDialog> {
   Task task;
 
@@ -291,24 +292,22 @@ class _TaskDialogState extends State<TaskDialog> {
   }
 }
 
-
-
 class ExamDialog extends StatefulWidget {
   final String title, description, buttonText;
   ExamBloc bloc;
 
   ExamDialog(
       {@required this.title,
-        @required this.description,
-        @required this.buttonText,
-        @required this.bloc});  @override
+      @required this.description,
+      @required this.buttonText,
+      @required this.bloc});
 
+  @override
   _ExamDialogState createState() => _ExamDialogState();
 }
 
-
 class _ExamDialogState extends State<ExamDialog> {
-  Exam task;
+  Exam exam;
 
   TextEditingController subjController;
 
@@ -327,18 +326,18 @@ class _ExamDialogState extends State<ExamDialog> {
     whenController = TextEditingController();
     noteController = TextEditingController();
 
-    task = Exam();
+    exam = Exam();
 
     subjController.addListener(() {
-      task.subject = subjController.text;
+      exam.subject = subjController.text;
     });
 
     whenController.addListener(() {
-      task.date = calendarController.selectedDay;
+      exam.date = calendarController.selectedDay;
     });
 
     noteController.addListener(() {
-      task.note = noteController.text;
+      exam.note = noteController.text;
     });
   }
 
@@ -347,13 +346,14 @@ class _ExamDialogState extends State<ExamDialog> {
     debugPrint("TASK DIALOG BUILD");
 
     void saveTask() {
+      debugPrint("SAVE EXAM: $exam");
       Navigator.pop(context);
-      widget.bloc.add(AddExamEvent(task));
+      widget.bloc.add(AddExamEvent(exam));
     }
 
     void setDate(DateTime day) {
       debugPrint("DAY: $day");
-      task.date = day;
+      exam.date = day;
       whenController.text = Utils.apiDayFormat(day);
     }
 
@@ -416,26 +416,7 @@ class _ExamDialogState extends State<ExamDialog> {
     dialogContent(BuildContext context) {
       return Container(
         key: Key("task_dialog"),
-//        padding: EdgeInsets.only(
-//          top: Cv.avatarRadius,
-//          bottom: Cv.padding,
-//          left: Cv.padding,
-//          right: Cv.padding,
-//        ),
         margin: EdgeInsets.only(top: Cv.avatarRadius),
-//        decoration: new BoxDecoration(
-//          color: Colors.black,
-//          shape: BoxShape.rectangle,
-//          borderRadius: BorderRadius.circular(20),
-//          border: Border(),
-//          boxShadow: [
-//            BoxShadow(
-//              color: Colors.black26,
-//              blurRadius: 30.0,
-//              offset: const Offset(0, 20.0),
-//            ),
-//          ],
-//        ),
         child: Column(
           mainAxisSize: MainAxisSize.min, // To make the card compact
           children: <Widget>[
@@ -482,7 +463,7 @@ class _ExamDialogState extends State<ExamDialog> {
             ColorPicker(
               onColorSelected: (color) {
                 debugPrint("ON COLOR SELECT: $color");
-                task.colorValue = color.value;
+                exam.colorValue = color.value;
               },
             ),
 
@@ -494,8 +475,6 @@ class _ExamDialogState extends State<ExamDialog> {
               onTap: () {
                 showCalendarDialog();
               },
-
-//              enabled: false,
               decoration: InputDecoration(
                   hintText: "Когда",
                   prefixIcon: Padding(
@@ -506,8 +485,6 @@ class _ExamDialogState extends State<ExamDialog> {
                       width: 24,
                     ),
                   )),
-//              key: Key(AppKeys.subjInput),
-
               controller: whenController,
             ),
 
@@ -563,9 +540,6 @@ class _ExamDialogState extends State<ExamDialog> {
   }
 }
 
-
-
-
 class CustomDialog extends StatelessWidget {
   final String title, description, buttonText;
   final Image image;
@@ -574,8 +548,9 @@ class CustomDialog extends StatelessWidget {
   TextEditingController teacherController;
   TextEditingController placeController;
   Classwork classwork;
+  Set<int> pickedDays;
 
-  DateTime date;
+  DateTime currentDate;
 
   BuildContext buildcontext;
   Bloc bloc;
@@ -585,7 +560,7 @@ class CustomDialog extends StatelessWidget {
       @required this.description,
       @required this.buttonText,
       this.image,
-      this.date,
+      this.currentDate,
       this.buildcontext,
       this.bloc});
 
@@ -595,17 +570,27 @@ class CustomDialog extends StatelessWidget {
     teacherController = TextEditingController();
     placeController = TextEditingController();
 
-    ValueNotifier<DateTime> startDate = ValueNotifier(DateTime.now());
-    ValueNotifier<DateTime> finishDate = ValueNotifier(DateTime.now());
+    ValueNotifier<DateTime> startDateNotifier = ValueNotifier(currentDate);
+    ValueNotifier<DateTime> finishDateNotifier = ValueNotifier(currentDate);
 
-    classwork = Classwork();
+    pickedDays = {};
+
+    classwork = Classwork()..colorValue = 0xFFE942A9;
+
+    startDateNotifier.addListener(() {
+      classwork.startDate = startDateNotifier.value;
+    });
+
+    finishDateNotifier.addListener(() {
+      classwork.finishDate = finishDateNotifier.value;
+    });
 
     subjController.addListener(() {
       classwork.subject = subjController.text;
     });
 
     teacherController.addListener(() {
-      classwork.tutor = teacherController.text;
+      classwork.teacher = teacherController.text;
     });
 
     placeController.addListener(() {
@@ -617,30 +602,24 @@ class CustomDialog extends StatelessWidget {
 
     ValueNotifier<bool> isEveryWeek = ValueNotifier(false);
 
-//    final AppBloc bloc = BlocProvider.of<AppBloc>(buildcontext);
+    isEveryWeek.addListener(() {
+      classwork.isEveryWeekShow = isEveryWeek.value;
+    });
 
     void saveClasswork() {
-      var result = classwork
-//        ..startDate = DateTime.now()
-//        ..finishDate = DateTime.now()
-//        ..subject = subjController.text
-        ..place = "404"
-        ..tutor = "Kokokoev";
-
-      bloc.add(AddClassworkEvent(result));
-
+      bloc.add(AddClassworkEvent(classwork, pickedDays));
       Navigator.pop(context);
     }
 
     dialogContent(BuildContext context) {
       return Container(
         padding: EdgeInsets.only(
-          top: Cv.avatarRadius + Cv.padding,
+          top: 16,
           bottom: Cv.padding,
           left: Cv.padding,
           right: Cv.padding,
         ),
-        margin: EdgeInsets.only(top: Cv.avatarRadius),
+//        margin: EdgeInsets.only(top: Cv.avatarRadius),
         decoration: new BoxDecoration(
           color: Colors.black,
           shape: BoxShape.rectangle,
@@ -665,8 +644,17 @@ class CustomDialog extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(2, 8, 2, 2),
+              child: SizedBox(
+                  child: Container(
+                    color: Colors.white12,
+                  ),
+                  height: 1.0),
+            ),
             SizedBox(height: 16.0),
             TextField(
+              autofocus: false,
               decoration: InputDecoration(
                   hintText: "Предмет",
                   prefixIcon: Padding(
@@ -680,30 +668,15 @@ class CustomDialog extends StatelessWidget {
               key: Key(AppKeys.subjInput),
               controller: subjController,
             ),
-//
-//            RangeSlider(
-//              values: RangeValues(),
-//            ),
-
             ColorPicker(
               onColorSelected: (color) {
                 debugPrint("ON COLOR SELECT: $color");
                 classwork.colorValue = color.value;
               },
             ),
-
-//            SliderTheme(
-//              data: SliderThemeData(
-//                  rangeTrackShape: RectangularRangeSliderTrackShape()),
-//              child: Slider(
-//                value: 0,
-//                divisions: 10,
-//                min: 0,
-//                max: 100,
-//              ),
-//            ),
-
             TextField(
+
+              autofocus: false,
               decoration: InputDecoration(
                   hintText: "Преподаватель",
                   prefixIcon: Padding(
@@ -718,6 +691,7 @@ class CustomDialog extends StatelessWidget {
               controller: teacherController,
             ),
             TextField(
+              autofocus: false,
               decoration: InputDecoration(
                   hintText: "Где?",
                   prefixIcon: Padding(
@@ -731,84 +705,76 @@ class CustomDialog extends StatelessWidget {
               key: Key(AppKeys.dialog_place_input),
               controller: placeController,
             ),
-            Align(
-              alignment: Alignment.topLeft,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Text(
                 "Выбрать дни",
-                textAlign: TextAlign.center,
                 style: TextStyle(
+                  color: Color(0xffCC69A6),
                   fontSize: 16.0,
                 ),
               ),
             ),
-
-            WeekDayPicker(),
-
+            WeekDayPicker(currentDate, pickedDays),
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 FlatButton(
                     onPressed: () {
-                      DatePicker.showDateTimePicker(context,
-                          showTitleActions: true,
-                          minTime: DateTime(2018, 3, 5),
-                          maxTime: DateTime(2019, 6, 7), onChanged: (date) {
-                        print('change $date');
-                      }, onConfirm: (date) {
-                        print('confirm $date');
-//                        startDate.value =
-//                            "${date.hour.toString()}:${date.minute.toString()}";
-                        startDate.value = date;
-                        classwork.startDate = date;
-                      }, currentTime: startDate.value, locale: LocaleType.ru);
+                      showDatePicker(context, startDateNotifier);
                     },
                     child: ValueListenableBuilder(
-                      valueListenable: startDate,
+                      valueListenable: startDateNotifier,
                       builder: (ctx, value, ch) {
-                        var dateString =
-                            formatDate(value, [yyyy, '-', mm, '-', dd]);
+//                        var dateString = formatDate(value, [yyyy, '-', mm, '-', dd]);
+                        var dateString = formatDate(value, [
+                          HH,
+                          '-',
+                          nn,
+                        ]);
 
-                        return Text(
-                          dateString,
-                          style: TextStyle(color: Colors.blue),
+                        return Row(
+                          children: <Widget>[
+                            Text(
+                              dateString,
+                            ),
+                            Icon(Icons.arrow_drop_down),
+                          ],
                         );
                       },
                     )),
                 FlatButton(
                     onPressed: () {
-                      DatePicker.showDateTimePicker(context,
-                          showTitleActions: true,
-                          minTime: DateTime(2018, 3, 5),
-                          maxTime: DateTime(2019, 6, 7), onChanged: (date) {
-                        print('change $date');
-                      }, onConfirm: (date) {
-                        print('confirm $date');
-//                        finishDate.value =
-//                            "${date.hour.toString()}:${date.minute.toString()}";
-
-                        finishDate.value = date;
-                        classwork.finishDate = date;
-                      }, currentTime: finishDate.value, locale: LocaleType.ru);
+                      showDatePicker(context, finishDateNotifier);
                     },
                     child: ValueListenableBuilder(
-                        valueListenable: finishDate,
+                        valueListenable: finishDateNotifier,
                         builder: (BuildContext context, DateTime value, child) {
-                          var dateString =
-                              formatDate(value, [yyyy, '-', mm, '-', dd]);
+//                          var dateString = formatDate(value, [yyyy, '-', mm, '-', dd]);
+                          var dateString = formatDate(value, [
+                            HH,
+                            '-',
+                            nn,
+                          ]);
 
-                          return Text(
-                            dateString,
-                            style: TextStyle(color: Colors.blue),
+                          return Row(
+                            children: <Widget>[
+                              Text(
+                                dateString,
+                              ),
+                              Icon(Icons.arrow_drop_down)
+                            ],
                           );
                         })),
               ],
             ),
-
             Row(
               children: <Widget>[
                 ValueListenableBuilder(
                     valueListenable: isEveryWeek,
                     builder: (context, check, _) {
                       return Checkbox(
+                        activeColor: Colors.white,
                         value: check,
                         onChanged: (check) {
                           isEveryWeek.value = check;
@@ -818,7 +784,6 @@ class CustomDialog extends StatelessWidget {
                 Text("Отображать каждую неделю")
               ],
             ),
-
             FlatButton(
               padding: EdgeInsets.all(16),
               onPressed: () {
@@ -836,37 +801,6 @@ class CustomDialog extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(23)),
             )
-
-//          Container(
-//            height: 24,
-//            child: ListView.builder(
-//
-//                scrollDirection: Axis.horizontal,
-//                itemCount: Utils.weekdays.length,
-//                itemBuilder: (context, index) {
-//                  return Container(
-//                    height: 24,
-//                    width: 24,
-//                    child: Text(
-//                      Utils.weekdays[index],
-//                      style: TextStyle(fontSize: 8),
-//                    ),
-//                  );
-//                }
-////
-//                ),
-//          ),
-
-//          SizedBox(height: 24.0),
-//          Align(
-//            alignment: Alignment.bottomRight,
-//            child: FlatButton(
-//              onPressed: () {
-//                Navigator.of(context).pop(); // To close the dialog
-//              },
-//              child: Text(buttonText),
-//            ),
-//          ),
           ],
         ),
       );
@@ -877,8 +811,25 @@ class CustomDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(Cv.customDialogPadding),
       ),
       elevation: 0.0,
-      backgroundColor: Colors.black45,
+
+//      backgroundColor: Colors.red,
       child: SingleChildScrollView(child: dialogContent(context)),
     );
+  }
+
+  Future<DateTime> showDatePicker(
+      BuildContext context, ValueNotifier<DateTime> notifier) {
+    return DatePicker.showDateTimePicker(context, showTitleActions: true,
+        onConfirm: (date) {
+      print('confirm $date');
+      notifier.value = date;
+    },
+        minTime:
+            DateTime(currentDate.year, currentDate.month, currentDate.day, 0),
+        maxTime: DateTime(
+            currentDate.year, currentDate.month, currentDate.day, 23, 59),
+        currentTime: DateTime(currentDate.year, currentDate.month,
+            currentDate.day, DateTime.now().hour, DateTime.now().minute),
+        locale: LocaleType.ru);
   }
 }

@@ -39,10 +39,11 @@ class DayBloc extends Bloc<MonthEvent, MonthState> {
     if (event is ShowClassworkForDay) {
       debugPrint("GO TO _mapSelectedTabScreen");
       yield* classworkForDay(event);
-    } else if (event is AddClassworkEvent) {
-      debugPrint("GO TO mapClassworkForDayToState");
-      yield* addClasswork(event);
     }
+//    else if (event is AddClassworkEvent) {
+//      debugPrint("GO TO mapClassworkForDayToState");
+//      yield* addClasswork(event);
+//    }
   }
 
   Stream<MonthState> classworkForDay(ShowClassworkForDay event) async* {
@@ -57,14 +58,14 @@ class DayBloc extends Bloc<MonthEvent, MonthState> {
 //    yield ClassworksForDay();
 //  }
 
-  Stream<MonthState> addClasswork(AddClassworkEvent event) async* {
-    await saveClasswork(event.classwork);
-    yield ClassworkSaved(event.classwork);
-  }
+//  Stream<MonthState> addClasswork(AddClassworkEvent event) async* {
+//    await saveClasswork(event.classwork);
+//    yield ClassworkSaved(event.classwork);
+//  }
 
-  Future saveClasswork(Classwork classwork) {
-    return repo.saveClasswork(classwork);
-  }
+//  Future saveClasswork(Classwork classwork) {
+//    return repo.saveClasswork(classwork);
+//  }
 
   getCurrentDateClasswork() {}
 }

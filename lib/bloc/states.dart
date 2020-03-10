@@ -10,15 +10,18 @@ abstract class AppState extends Equatable {
   List<Object> get props => [];
 }
 
-class Week extends AppState {}
+class WeekHomeScreenState extends AppState {}
 
-class Month extends AppState {}
+class MonthHomeScreenState extends AppState {}
 
-class Day extends AppState {}
+class DayHomeScreenState extends AppState {}
 
-class ExamScreenState extends AppState {}
+class ExamHomeScreenState extends AppState {}
 
-class TaskScreenState extends AppState {}
+class TaskHomeScreenState extends AppState {}
+
+
+
 
 class AddExcercise extends AppState {}
 
