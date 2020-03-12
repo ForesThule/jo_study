@@ -48,8 +48,8 @@ class MonthBloc extends Bloc<MonthEvent, MonthState> {
 //  }
 
   Stream<MonthState> addClasswork(AddClassworkEvent event) async* {
-    debugPrint("ADD CLASSWORK ${event.classwork}");
-    debugPrint("ADD CLASSWORK ${event.pickedDays}");
+    debugPrint("CLASSWORK FOR SAVE ${event.classwork}");
+    debugPrint("PICKED DAYS ${event.pickedDays}");
     await saveClasswork(event.classwork, event.pickedDays);
     yield ClassworkSaved(event.classwork);
   }

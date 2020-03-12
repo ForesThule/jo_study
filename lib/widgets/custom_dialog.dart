@@ -47,9 +47,14 @@ class _TaskDialogState extends State<TaskDialog> {
 
   CalendarController calendarController;
 
+  FocusNode focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
+
+    focusNode.unfocus();
+
     calendarController = CalendarController();
 
     subjController = TextEditingController();
@@ -186,8 +191,7 @@ class _TaskDialogState extends State<TaskDialog> {
                   height: 1.0),
             ),
             TextField(
-              autofocus: false,
-
+              focusNode: focusNode,
               decoration: InputDecoration(
                   hintText: "Предмет",
                   prefixIcon: Padding(
@@ -218,6 +222,8 @@ class _TaskDialogState extends State<TaskDialog> {
             SizedBox(height: 8.0),
 
             TextField(
+              focusNode: focusNode,
+
               readOnly: true,
               autofocus: false,
               onTap: () {
@@ -242,6 +248,8 @@ class _TaskDialogState extends State<TaskDialog> {
 
             SizedBox(height: 8.0),
             TextField(
+              focusNode: focusNode,
+
               autofocus: false,
               decoration: InputDecoration(
                   hintText: "Заметки",

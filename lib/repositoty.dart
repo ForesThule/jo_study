@@ -138,29 +138,41 @@ class AppRepository {
 
     if (classwork.isEveryWeekShow) {
 
-      Utils.daysInRange(Utils.firstDayOfMonth(classwork.startDate), Utils.lastDayOfMonth(classwork.startDate))
+      pickedDays.forEach((weekdayNumber) {
+
+
+        Utils.daysInRange(Utils.firstDayOfMonth(classwork.startDate), Utils.lastDayOfMonth(classwork.startDate))
 //      Utils.daysInMonth(classwork.startDate)
-          .where((element) => element.weekday==classwork.startDate.weekday)
-          .forEach((day) {
-        var classworkCopy = classwork.copyWith(
-          startDate: DateTime(
-            classwork.startDate.year,
-            day.month,
-            day.day,
-            classwork.startDate.hour,
-            classwork.startDate.minute,
-          ),
-          finishDate: DateTime(
-            classwork.finishDate.year,
-            day.month,
-            day.day,
-            classwork.finishDate.hour,
-            classwork.finishDate.minute,
-          ),
+            .where((element) => element.weekday==weekdayNumber+1)
+            .forEach((day) {
+
+          var classworkCopy = classwork.copyWith(
+            startDate: DateTime(
+              classwork.startDate.year,
+              day.month,
+              day.day,
+              classwork.startDate.hour,
+              classwork.startDate.minute,
+            ),
+            finishDate: DateTime(
+              classwork.finishDate.year,
+              day.month,
+              day.day,
+              classwork.finishDate.hour,
+              classwork.finishDate.minute,
+            ),
+          );
+
+          classworkbox.add(classworkCopy);
+        }
+
+
         );
 
-        classworkbox.add(classworkCopy);
+
+
       });
+
     }else{
   classworkbox.add(classwork);
     }

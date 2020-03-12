@@ -109,11 +109,17 @@ class _WeekScreenState extends State<WeekScreen> {
   }
 
   buildColumns(Map<DateTime, List<Classwork>> map) {
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: IntrinsicHeight(
         child: Row(
           children: map.keys.map((d) {
+
+            var classworks = map[d];
+            classworks.sort((a,b){
+              return a.startDate.compareTo(b.startDate);
+            });
             return Expanded(
               flex: 4,
               child: Column(
@@ -129,12 +135,20 @@ class _WeekScreenState extends State<WeekScreen> {
                       width: 50,
                     ),
                   ),
-                  ...map[d].map((classwork) {
+                  ...classworks.map((classwork) {
                     var startDate = classwork.startDate;
 
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(2, 2, 2, 2),
                       child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                          Text("${classwork.startDate.hour}:${classwork.startDate.minute}",style: TextStyle(fontSize: 8),)
+
+
+
+                        ],),
 //                        child: Text("${startDate.hour}:${startDate.minute}"),
                         height: 50,
                         width: 50,

@@ -28,7 +28,7 @@ class ListWheelScrollViewX extends StatelessWidget {
         controller: controller,
         itemExtent: itemExtent,
         diameterRatio: diameterRatio,
-        physics: FixedExtentScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         childDelegate: ListWheelChildLoopingListDelegate(
           children: childs,
         ),

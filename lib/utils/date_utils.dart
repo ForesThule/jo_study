@@ -93,6 +93,7 @@ class Utils {
     var beginningNextMonth = (month.month < 12)
         ? new DateTime(month.year, month.month + 1, 1)
         : new DateTime(month.year + 1, 1, 1);
+    return beginningNextMonth;
     return beginningNextMonth.subtract(new Duration(days: 1));
   }
 
